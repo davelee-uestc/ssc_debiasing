@@ -48,7 +48,7 @@ def transform_feature(model, centers, data, N, lr=1e-3):
     return transformation
 
 
-def adjust_classfifer(fc, data, N=100, mask=None, B=64, mask2=None,criterion=F.cross_entropy):
+def adjust_classifier(fc, data, N=100, mask=None, B=64, mask2=None, criterion=F.cross_entropy):
     group1 = {k: v[mask] for k, v in data.items()}
     mask2 = (~mask) if mask2 is None else mask2
     group2 = {k: v[mask2] for k, v in data.items()}
@@ -83,7 +83,7 @@ def main_exp(all_train_data, all_test_data, n_classes, logger, N1, N2, model=Non
     Y,PRED_NEW= _test_extracted(centers,train_data,logger,B=4096)
     mask=torch.logical_and(PRED_ORI!=Y,PRED_NEW==Y).flatten().cuda()
     mask2=(PRED_ORI==Y).flatten().cuda()
-    fc_new=adjust_classfifer(model.fc, train_data, N2, mask, mask2=mask2)
+    fc_new=adjust_classifier(model.fc, train_data, N2, mask, mask2=mask2)
     model2=ModelWrapper(model,fc_new)
 
     plog("debiased,x",wrapped_model_test_extracted(model2, all_test_data, logger=None, B=4096))
@@ -133,20 +133,21 @@ if __name__ == '__main__':
     datasets=[sys.argv[1]]
     args_map={k:all_args_map[k] for k in datasets} if datasets is not None else all_args_map
     logger = utils.Logger(fpath=f"{exp_name}.log")
-    W,M=[],[]
-    for i in range(1):
-        set_seed(i)
-        wga,mean,c=0,0,0
-        for dataset_name,exp_args in args_map.items():
-            args = get_args(exp_args)
-            print(dataset_name)
+    for dataset_name, exp_args in args_map.items():
+        args = get_args(exp_args)
+        wga, mean, c = 0, 0, 0
+        W, M = [], []
+        for i in range(1):
+            set_seed(i)
             w,m=(run_exp(args,logger))
             print(f"seed {i} {dataset_name} macc:{m}, wga:{w}")
             wga+=w
             mean+=m
             c+=1
-        W+=[wga/c]
-        M+=[mean/c]
-        print(f"seed {i} mean mAcc={mean/c}, mean wga={wga/c}")
+            W+=[w]
+            M+=[m]
+        Mmacc,Mwga=torch.cat([w[None] for w in M]).mean(),torch.cat([w[None] for w in W]).mean()
+        STDmacc,STDwga=torch.cat([w[None] for w in M]).std(),torch.cat([w[None] for w in W]).std()
+        print(f"Dataset {dataset_name} mean mAcc={Mmacc}+-{STDmacc}, mean wga={Mwga}+-{STDwga}")
 
 
