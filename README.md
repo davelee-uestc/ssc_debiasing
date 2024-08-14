@@ -1,9 +1,8 @@
-# Mitigating Unknown Bias in Model by Suppressing Spurious Features
+# Mitigating Unknown Bias by Suppressing Spurious Features
 
-This repository contains experiments for the paper _Mitigating Unknown Bias in Model by Suppressing Spurious Features_
+This repository contains experiments for the paper _Mitigating Unknown Bias by Suppressing Spurious Features_
 ## Introduction
-Deep neural networks (DNNs) often learn spurious correlations, also known as shortcut learning, leading to incorrect predictions in critical applications such as automated diagnosis. Traditional methods require prior knowledge of the bias attributes or retraining models, limiting their applicability. This paper presents a novel debiasing method, SSC, which assumes that biases arise from unintended patterns in the training data due to sampling bias. SSC applies a learned linear transformation after the encoder to neutral the bias attributes and lower the coefficient of bias attributes in the classifier to remove the impact of spurious features without altering the encoder. Experimental results across multiple benchmarks demonstrate that SSC significantly improves performance on tasks affected by spurious features, achieving state-of-the-art results in both vision and text tasks. Ablation studies and qualitative analyses further validate the proposed method.
-
+Removing unintended spurious correlations learned in Deep neural networks (DNNs), also known as shortcut learning, is crucial for critical applications such as automated diagnosis.  In this study, we introduce a novel debiasing method Suppressing Spurious Features (SSF). Unlike previous methods, SSF assumes that biases arise from unintended patterns in the training data due to sampling bias, enabling estimating the unbiased mean of spurious features to neutralize them without prior knowledge of bias attributes. Specifically, SSF learns a linear transformation after the encoder to neutralize the bias attributes, then lowers their coefficients in the classifier, thus the impact of spurious features is removed without retraining the encoder. Experimental results across multiple vision and text benchmarks demonstrate that SSF significantly improves the performance of models affected by spurious features, achieving state-of-the-art. Ablation studies and qualitative analyses validate the effectiveness of SSF in removing spurious features and reducing bias.
 
 ## File Structure
 
